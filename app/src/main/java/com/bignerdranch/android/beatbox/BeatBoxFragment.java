@@ -27,39 +27,52 @@ public class BeatBoxFragment extends Fragment{
         return new BeatBoxFragment();
     }
 
+    //创建BeatBox实例
     @Override
     public void onCreate( Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mBeatBox = new BeatBox(getActivity());
     }
 
+    //实例化绑定类
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState){
         FragmentBeatBoxBinding binding = DataBindingUtil
                 .inflate(inflater,R.layout.fragment_beat_box,container,false);
-        binding.recyclerView.setLayoutManager(new GridLayoutManager(getActivity(),3));
-        binding.recyclerView.setAdapter(new SoundAdapter(mBeatBox.getSounds()));
+        binding.recyclerView.setLayoutManager(new GridLayoutManager(getActivity(),3));//配置RecyclerView
+        binding.recyclerView.setAdapter(new SoundAdapter(mBeatBox.getSounds()));//使用SoundAdapter传入声音资源
         return binding.getRoot();
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mBeatBox.release();
+    }
+
+    //创建SoundHolder
     private  class SoundHolder extends RecyclerView.ViewHolder{
         private ListItemSoundBinding mBinding;
         public SoundHolder(ListItemSoundBinding binding) {
             super(binding.getRoot());
             mBinding =binding;
             mBinding.setViewModel(new SoundViewModel(mBeatBox));
-            //关联使用视图模型
         }
         public void bind(Sound sound){
            mBinding.getViewModel().setSound(sound);
             mBinding.executePendingBindings();
-        }
+        }//关联使用视图模型
     }
+    //创建SoundAdapter
     private class SoundAdapter extends RecyclerView.Adapter<SoundHolder>{
+       //绑定Sound列表
         private List<Sound>mSounds;
         public SoundAdapter(List<Sound>sounds){
             mSounds = sounds;
         }
+
+        //
         @Override
         public SoundHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             LayoutInflater inflater = LayoutInflater.from(getActivity());
@@ -68,10 +81,10 @@ public class BeatBoxFragment extends Fragment{
             return new SoundHolder(binding);
         }
 
-        @Override//调用biud方法
+        @Override
         public void onBindViewHolder(SoundHolder holder, int position) {
-                Sound sound = mSounds.get(position);
-            holder.bind(sound);
+            Sound sound = mSounds.get(position);
+            holder.bind(sound);//调用bind方法
         }
 
         @Override
